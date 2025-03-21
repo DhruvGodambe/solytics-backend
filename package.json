@@ -1,0 +1,20 @@
+{
+  "name": "Parser Raydium Pool",
+  "version": "1.0.0",
+  "description": "Monitor new liquidity pools on Solana using Raydium SDK",
+  "main": "parser.ts",
+  "scripts": {
+    "start": "ts-node parser.ts"
+  },
+  "dependencies": {
+    "@metaplex-foundation/js": "^0.20.1",
+    "@raydium-io/raydium-sdk": "^1.3.1-beta.52",
+    "@raydium-io/raydium-sdk-v2": "^0.1.118-alpha",
+    "@solana/spl-token": "^0.4.6",
+    "@solana/web3.js": "^1.40.0",
+    "@types/node": "^20.12.11",
+    "bs58": "^6.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5"
+  }
+}
