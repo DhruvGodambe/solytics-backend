@@ -2,7 +2,9 @@ import { Connection, PublicKey, KeyedAccountInfo, SolanaJSONRPCError } from '@so
 import { LIQUIDITY_STATE_LAYOUT_V4, LiquidityStateV4, MAINNET_PROGRAM_ID } from '@raydium-io/raydium-sdk';
 import { ClmmRpcData } from "@raydium-io/raydium-sdk-v2";
 import dotenv from 'dotenv';
+import WebSocket from 'ws';
 dotenv.config();
+
 
 // Solana RPC endpoint
 const RPC_ENDPOINT = process.env.RPC_URL || "";
@@ -21,28 +23,39 @@ let existingLiquidityPools = new Set<string>();
 // Current timestamp in seconds
 const currentTime = new Date((Date.now()));
 
+const webSocket = new WebSocket(process.env.WSS_RPC_URL || "");
+
+webSocket.addEventListener('open', () => {
+    console.log("WebSocket connection opened");
+});
+webSocket.addEventListener('close', () => {
+    console.log("WebSocket connection closed");
+});
+webSocket.addEventListener('error', (error) => {
+    console.error("WebSocket error:", error);
+});
+
+let counter = 0;
 // Function to start monitoring both liquidity programs
 async function startMonitoringPools(): Promise<void> {
     console.log('Starting monitoring for Raydium AMM and CLMM pools...');
     console.log('Raydium AMM Liquidity Program ID:', raydiumLiquidityProgramIdAmm.toString());
-    console.log('Raydium CLMM Liquidity Program ID:', raydiumLiquidityProgramIdClmm.toString());
-    // console.log('Raydium CPMM Liquidity Program ID:', raydiumLiquidityProgramIdCpmm.toString());
 
     try {
         // Subscribe to AMM contract
-        // connection.onProgramAccountChange(
-        //     raydiumLiquidityProgramIdAmm, 
-        //     (info) => processRaydiumPoolUpdate(info, 'AMM'), 
-        //     'confirmed', 
-        //     [{ dataSize: LIQUIDITY_STATE_LAYOUT_V4.span }]
-        // );
+        connection.onProgramAccountChange(
+            raydiumLiquidityProgramIdAmm, 
+            (info) => processRaydiumPoolUpdate(info, 'AMM'), 
+            'confirmed',
+            [{dataSize: LIQUIDITY_STATE_LAYOUT_V4.span}]
+        );
 
         // Subscribe to CLMM contract
-        connection.onLogs(
-            raydiumLiquidityProgramIdClmm, 
-            (info) => processRaydiumClmmPool(info, 'CLMM'), 
-            'confirmed'
-        );
+        // connection.onLogs(
+        //     raydiumLiquidityProgramIdClmm, 
+        //     (info) => processRaydiumClmmPool(info, 'CLMM'), 
+        //     'confirmed'
+        // );
 
         // Subscribe to a **specific** pool by its public key
         // connection.onProgramAccountChange(
@@ -66,13 +79,15 @@ async function startMonitoringPools(): Promise<void> {
 
 // Function to process pool updates
 function processRaydiumPoolUpdate(updatedAccountInfo: any, programType: string): void {
-    console.log(updatedAccountInfo);
     const { accountId, accountInfo } = updatedAccountInfo;
     
+    const now = new Date(Date.now());
+    // console.log("Logs subscribe api called at: ", now.getTime()/1000 - currentTime.getTime()/1000, "secs" );
+    // console.log("counter: ", counter++);
     if(accountInfo?.data) {
         const poolState: LiquidityStateV4 = LIQUIDITY_STATE_LAYOUT_V4.decode(accountInfo?.data);
         // console.log("account info detected: ", {accountId: accountId.toString()});
-        console.log("token info detected: ", poolState);
+        // console.log("token info detected: ", poolState);
         // console.log(`[${programType}] Detected Pool Update for Account:`, accountId.toString());
         evaluateNewPool(accountId, poolState, programType);
     } else if (updatedAccountInfo?.data) {

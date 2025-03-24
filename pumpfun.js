@@ -1,9 +1,10 @@
 const { Connection, PublicKey } = require('@solana/web3.js');
 const fetch = require('node-fetch');
 const { Metaplex, token } =  require("@metaplex-foundation/js");
+require("dotenv").config();
 
 // Connect to the Solana mainnet
-const connection = new Connection('https://multi-magical-frost.solana-mainnet.quiknode.pro/3185adc05cf6a6a71925659164c2328ffe800551', 'confirmed');
+const connection = new Connection(process.env.RPC_URL || "", 'confirmed');
 const metaplex = Metaplex.make(connection);
 
 const programId = new PublicKey('TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM');
