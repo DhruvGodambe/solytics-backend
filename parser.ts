@@ -23,18 +23,6 @@ let existingLiquidityPools = new Set<string>();
 // Current timestamp in seconds
 const currentTime = new Date((Date.now()));
 
-const webSocket = new WebSocket(process.env.WSS_RPC_URL || "");
-
-webSocket.addEventListener('open', () => {
-    console.log("WebSocket connection opened");
-});
-webSocket.addEventListener('close', () => {
-    console.log("WebSocket connection closed");
-});
-webSocket.addEventListener('error', (error) => {
-    console.error("WebSocket error:", error);
-});
-
 let counter = 0;
 // Function to start monitoring both liquidity programs
 async function startMonitoringPools(): Promise<void> {

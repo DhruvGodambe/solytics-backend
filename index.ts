@@ -102,7 +102,7 @@ async function handleCpmmTransaction(transaction: any, signature: string): Promi
             isInitializeTx = true;
         }
 
-        if(transaction.meta.logMessages[log].includes('Create') && message.staticAccountKeys[13] == "So11111111111111111111111111111111111111112") {
+        if(log.includes('Create') && (message.staticAccountKeys[13] == "So11111111111111111111111111111111111111112" || message.staticAccountKeys[17] == "So11111111111111111111111111111111111111112")) {
             // console.log("log: ", log);
             isCreate = true;
         }
